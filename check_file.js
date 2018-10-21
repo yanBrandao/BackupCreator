@@ -7,6 +7,8 @@ var getDir = false;
 var comD = false;
 var jumpLine = false;
 var novoDiretorio = "";
+
+//#region Processamento dos Argumentos.
 /* Leitura dos argumentos */
 process.argv.forEach(function (val, index, array) {
     /* Validação para realizar leitura do Diretório*/
@@ -43,12 +45,24 @@ if(novoDiretorio == ""){
     process.exit();
 }
 
+var pasta = novoDiretorio.toString().split("\\");
+
+/* Validação se Diretório Backup existe. */
+var backupDir =  novoDiretorio + "..\\" + pasta[(pasta.length - 2)].toString() + "_bkp";
+if(!fs.existsSync(backupDir)){
+    fs.mkdirSync(backupDir);
+    console.log(log + "Diretório de backup criado com sucesso!");
+}
+
+//#endregion
+
 function loopCheckArquivo(){
     var dataHoje = new Date();
     var arquivos = fs.readdirSync(novoDiretorio);
     var indiceArquivos = new Array(arquivos.length);
     var countTxt = 0;
     var i = 0;
+    /* Verifica os arquivos na pasta e guarda as posições dos txt em um vetor. */
     arquivos.forEach(arq =>{
         var splitArq = arq.split(".");
         if(splitArq[splitArq.length - 1] == "txt"){
@@ -59,12 +73,6 @@ function loopCheckArquivo(){
         }
         i++;
     });
-    var pasta = novoDiretorio.toString().split("\\");
-    var backupDir =  novoDiretorio + "..\\" + pasta[(pasta.length - 2)].toString() + "_bkp";
-    if(!fs.existsSync(backupDir)){
-        fs.mkdirSync(backupDir);
-        console.log(log + "Diretório de backup criado com sucesso!");
-    }
 
     if(!jumpLine){
         process.stdout.write("Aguardando novos arquivos.");
@@ -87,10 +95,5 @@ function loopCheckArquivo(){
     });
 }
 
-
-
+//Timer para processar a verificação de arquivos a cada 2 segundos.
 setInterval(loopCheckArquivo, 2000);
-
-
-
-
