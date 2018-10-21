@@ -46,6 +46,19 @@ if(novoDiretorio == ""){
 function loopCheckArquivo(){
     var dataHoje = new Date();
     var arquivos = fs.readdirSync(novoDiretorio);
+    var indiceArquivos = new Array(arquivos.length);
+    var countTxt = 0;
+    var i = 0;
+    arquivos.forEach(arq =>{
+        var splitArq = arq.split(".");
+        if(splitArq[splitArq.length - 1] == "txt"){
+            countTxt++;
+            indiceArquivos[i] = true;
+        }else{
+            indiceArquivos[i] = false;
+        }
+        i++;
+    });
     var pasta = novoDiretorio.toString().split("\\");
     var backupDir =  novoDiretorio + "..\\" + pasta[(pasta.length - 2)].toString() + "_bkp";
     if(!fs.existsSync(backupDir)){
@@ -60,13 +73,17 @@ function loopCheckArquivo(){
         process.stdout.write(".");
     }
 
-    if(arquivos.length > 0){
+    if(countTxt > 0){
         jumpLine = !jumpLine;
         console.log(" ");
     }
+    i = 0;
     arquivos.forEach(arq =>{
-        var robot = new BlackMirrorRobot(novoDiretorio + arq);
-        robot.makeBackup(backupDir);
+        if(indiceArquivos[i] == true){ 
+            var robot = new BlackMirrorRobot(novoDiretorio + arq);
+            robot.makeBackup(backupDir);
+        }
+        i++;
     });
 }
 
