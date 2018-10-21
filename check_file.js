@@ -1,30 +1,61 @@
+var BlackMirrorRobot = require("./BlackMirrorRobot.js");
 var fs = require("fs");
 const path = require('path')
 
-const folderPath = 'C:/Users/yan.diniz/Documents/Directory'
-
-
-
-
-var date = new Date();
-var data = fs.readdirSync(folderPath).toString() + "\n";//date.getDate().toString() + "\n";
-
-// Create a writable stream
-var writerStream = fs.createWriteStream('output.txt', {'flags': 'a'});
-
-// Write the data to stream with encoding to be utf8
-writerStream.write(data,'UTF8');
-
-// Mark the end of file
-writerStream.end();
-
-// Handle stream events --> finish, and error
-writerStream.on('finish', function() {
-   console.log("Write completed.");
+var getDir = false;
+var comD = false;
+var novoDiretorio;
+/* Leitura dos argumentos */
+process.argv.forEach(function (val, index, array) {
+    /* Validação para realizar leitura do Diretório*/
+    if(getDir == true){
+        novoDiretorio = val.toString();
+        getDir = false;
+    }
+    /* Validação para checkar se o argumento atual é um comando */
+    if(val.includes('-')){
+        var comando = val[val.indexOf('-') + 1];
+        /* Se o comando atual for de ajuda, o próximo valor será 'h' */
+        if(comando == 'h'){
+            console.log("Uso: node check_file.js [-h] [-d diretório]");
+            return; 
+        }
+        /* Se o comando for 'd', então o próximo argumento deverá ser um diretório */
+        if(comando == 'd' && comD == false){
+            getDir = true;
+            comD = true;
+        }else if(comando == 'd' && comD == true)
+        {
+            console.log("Operação inválida, use apenas um diretório para backup!");
+            process.exit();
+        }
+        else{
+            console.log("Argumento inválido, use -h para mais informações.")
+        }
+    }
 });
 
-writerStream.on('error', function(err) {
+
+var dataHoje = new Date();
+var arquivos = fs.readdirSync(novoDiretorio);
+
+console.log("Novo arquivo detectado, iniciando processamento...");
+
+/* Criação de Stream de Leitura do Arquivo */
+var streamEscrita = fs.createWriteStream('output.txt', {'flags': 'a'});
+
+/* Configurando encoding para UTF8 */
+streamEscrita.write(arquivos.toString(),'UTF8');
+
+/* Mover o ponteiro do Stream para o final do Arquivo. */
+streamEscrita.end();
+
+/* Evento de fim do processamento. */
+streamEscrita.on('finish', function() {
+   console.log("Processamento concluído com sucesso.");
+});
+
+/* Evento de erro */
+streamEscrita.on('error', function(err) {
    console.log(err.stack);
 });
-
-console.log("Program Ended");
