@@ -6,7 +6,7 @@ const path = require('path')
 var getDir = false;
 var comD = false;
 var jumpLine = false;
-var novoDiretorio;
+var novoDiretorio = "";
 /* Leitura dos argumentos */
 process.argv.forEach(function (val, index, array) {
     /* Validação para realizar leitura do Diretório*/
@@ -39,7 +39,7 @@ process.argv.forEach(function (val, index, array) {
 });
 
 if(novoDiretorio == ""){
-    console.log(log + "Por favor, insira um diretório para começar.")
+    console.log(log + "Por favor, insira um diretório para começar. Use -h para ajuda.");
     process.exit();
 }
 
