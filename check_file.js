@@ -1,9 +1,11 @@
+const log = "[Serviço]: ";
 var BlackMirrorRobot = require("./BlackMirrorRobot.js");
 var fs = require("fs");
 const path = require('path')
 
 var getDir = false;
 var comD = false;
+var jumpLine = false;
 var novoDiretorio;
 /* Leitura dos argumentos */
 process.argv.forEach(function (val, index, array) {
@@ -17,7 +19,7 @@ process.argv.forEach(function (val, index, array) {
         var comando = val[val.indexOf('-') + 1];
         /* Se o comando atual for de ajuda, o próximo valor será 'h' */
         if(comando == 'h'){
-            console.log("Uso: node check_file.js [-h] [-d diretório]");
+            console.log(log + "Uso: node check_file.js [-h] [-d diretório]");
             return; 
         }
         /* Se o comando for 'd', então o próximo argumento deverá ser um diretório */
@@ -26,36 +28,45 @@ process.argv.forEach(function (val, index, array) {
             comD = true;
         }else if(comando == 'd' && comD == true)
         {
-            console.log("Operação inválida, use apenas um diretório para backup!");
+            console.log(log + "Operação inválida, use apenas um diretório para backup!");
             process.exit();
         }
         else{
-            console.log("Argumento inválido, use -h para mais informações.")
+            console.log(log + "Argumento inválido, use -h para mais informações.")
         }
     }
 });
 
+function loopCheckArquivo(){
+    if(!jumpLine){
+        process.stdout.write("Aguardando novos arquivos.");
+        jumpLine = true;
+    }else{
+        process.stdout.write(".");
+    }
 
-var dataHoje = new Date();
-var arquivos = fs.readdirSync(novoDiretorio);
+    var dataHoje = new Date();
+    var arquivos = fs.readdirSync(novoDiretorio);
+    var pasta = novoDiretorio.toString().split("\\");
+    var backupDir =  novoDiretorio + "..\\" + pasta[(pasta.length - 2)].toString() + "_bkp";
+    if(!fs.existsSync(backupDir)){
+        fs.mkdir(backupDir);
+    }
 
-console.log("Novo arquivo detectado, iniciando processamento...");
+    if(arquivos.length > 0){
+        jumpLine = !jumpLine;
+        console.log(" ");
+    }
+    arquivos.forEach(arq =>{
+        var robot = new BlackMirrorRobot(novoDiretorio + arq);
+        robot.makeBackup(backupDir);
+    });
+}
 
-/* Criação de Stream de Leitura do Arquivo */
-var streamEscrita = fs.createWriteStream('output.txt', {'flags': 'a'});
 
-/* Configurando encoding para UTF8 */
-streamEscrita.write(arquivos.toString(),'UTF8');
 
-/* Mover o ponteiro do Stream para o final do Arquivo. */
-streamEscrita.end();
+setInterval(loopCheckArquivo, 1500);
 
-/* Evento de fim do processamento. */
-streamEscrita.on('finish', function() {
-   console.log("Processamento concluído com sucesso.");
-});
 
-/* Evento de erro */
-streamEscrita.on('error', function(err) {
-   console.log(err.stack);
-});
+
+
