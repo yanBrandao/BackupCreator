@@ -20,7 +20,7 @@ process.argv.forEach(function (val, index, array) {
         /* Se o comando atual for de ajuda, o próximo valor será 'h' */
         if(comando == 'h'){
             console.log(log + "Uso: node check_file.js [-h] [-d diretório]");
-            return; 
+            process.exit(); 
         }
         /* Se o comando for 'd', então o próximo argumento deverá ser um diretório */
         if(comando == 'd' && comD == false){
@@ -33,9 +33,15 @@ process.argv.forEach(function (val, index, array) {
         }
         else{
             console.log(log + "Argumento inválido, use -h para mais informações.")
+            process.exit();
         }
     }
 });
+
+if(novoDiretorio == ""){
+    console.log(log + "Por favor, insira um diretório para começar.")
+    process.exit();
+}
 
 function loopCheckArquivo(){
     var dataHoje = new Date();
