@@ -38,19 +38,20 @@ process.argv.forEach(function (val, index, array) {
 });
 
 function loopCheckArquivo(){
-    if(!jumpLine){
-        process.stdout.write("Aguardando novos arquivos.");
-        jumpLine = true;
-    }else{
-        process.stdout.write(".");
-    }
-
     var dataHoje = new Date();
     var arquivos = fs.readdirSync(novoDiretorio);
     var pasta = novoDiretorio.toString().split("\\");
     var backupDir =  novoDiretorio + "..\\" + pasta[(pasta.length - 2)].toString() + "_bkp";
     if(!fs.existsSync(backupDir)){
-        fs.mkdir(backupDir);
+        fs.mkdirSync(backupDir);
+        console.log(log + "Diretório de backup criado com sucesso!");
+    }
+
+    if(!jumpLine){
+        process.stdout.write("Aguardando novos arquivos.");
+        jumpLine = true;
+    }else{
+        process.stdout.write(".");
     }
 
     if(arquivos.length > 0){
@@ -65,7 +66,7 @@ function loopCheckArquivo(){
 
 
 
-setInterval(loopCheckArquivo, 1500);
+setInterval(loopCheckArquivo, 2000);
 
 
 

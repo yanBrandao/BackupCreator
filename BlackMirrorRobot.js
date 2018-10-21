@@ -13,14 +13,14 @@ BlackMirrorRobot.prototype.setfile = function(file) {
 
 BlackMirrorRobot.prototype.makeBackup = function(backupAdress){
   var fs = require("fs");
-
-  console.log(log + "Novo arquivo detectado, iniciando processamento...");
+  var nomeArquivo = this.file.toString().split("\\");
+  console.log(log + "Novo arquivo detectado ("+ nomeArquivo[nomeArquivo.length - 1] +"), iniciando processamento...");
   
   var dataHoje = new Date();
   fs.appendFileSync(this.file, "Modificado em " + dataHoje.getDate() + "-" + (dataHoje.getMonth() + 1) +
-  "-" + dataHoje.getFullYear() + "\r\n");
+  "-" + dataHoje.getFullYear() + " às " + dataHoje.getHours() + ":" + dataHoje.getMinutes() + "\r\n");
 
-  var nomeArquivo = this.file.toString().split("\\");
+  
 
   fs.renameSync(this.file, backupAdress + "\\" + nomeArquivo[nomeArquivo.length - 1]);
   console.log(log + "Processamento concluído com sucesso.");
